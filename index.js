@@ -8,8 +8,8 @@ const port = process.env.PORT || 5000
 //------ middlewere ----
 const corsOptions = {
     origin:['http://localhost:5173','http://localhost:5174'],
-    credentials:true,
-    optionSuccessStatus:200,
+    credentials: true,
+    optionSuccessStatus:200, 
 }
 app.use(cors(corsOptions))
 app.use(express.json())
@@ -37,6 +37,13 @@ async function run() {
         const result = await volunteerCollection.find().toArray()
         res.send(result)
     })
+
+    // save add volunteer post data
+    app.post('/volunteer', async(req,res) => {
+      const volunteerData = req.body
+      const result = await volunteerCollection.insertOne(volunteerData)
+      res.send(result)
+  })
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
