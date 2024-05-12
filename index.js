@@ -30,6 +30,7 @@ async function run() {
   try {
     
     const volunteerCollection = client.db('ServeSync').collection('volunteerNeed')
+    const beVolunteerCollection = client.db('ServeSync').collection('beVolunteer')
     
     
     // get all data from db
@@ -43,6 +44,13 @@ async function run() {
       const volunteerData = req.body
       const result = await volunteerCollection.insertOne(volunteerData)
       res.send(result)
+  })
+
+  // save Be a volunteer data 
+  app.post('/beAVolunteer', async(req,res) => {
+    const volunteerData = req.body
+    const result = await beVolunteerCollection.insertOne(volunteerData)
+    res.send(result)
   })
 
   // get specific data from database 
