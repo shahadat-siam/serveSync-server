@@ -46,6 +46,14 @@ async function run() {
       res.send(result)
   })
 
+  // get data by email
+  app.get('/volunteer/:email', async (req,res) => {
+    const email = req.params.email
+    const query = { email : email}
+    const result = await volunteerCollection.find(query).toArray()
+    res.send(result) 
+  })
+
   // save Be a volunteer data 
   app.post('/beAVolunteer', async(req,res) => {
     const volunteerData = req.body
