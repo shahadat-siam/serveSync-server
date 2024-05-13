@@ -15,6 +15,24 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 app.use(express.json())
+app.use(cookieParser())
+
+ // verify jwt  middlewere
+ const verifyToken = (req,res,next) => {
+    const token = req.cookies?.token
+        // console.log(token)
+        if(!token) return res.status(401).send({message:'unauthorized access'})
+        if(token) {
+            jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+                if(err){
+                   return  res.status(401).send({message:'unauthorized access'})
+                }
+                console.log(decoded)
+                req.user = decoded 
+                next()
+            })
+        } 
+ }
 
  
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ot34xl4.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -44,6 +62,16 @@ async function run() {
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
         }).send({success: true})
      })
+
+      // clear token on logout
+      app.get('/logout', (req,res) => {
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge:0,
+        }).send({success: true})
+     })
     
     // get all data from db
     app.get('/volunteer', async (req,res) => {
@@ -60,8 +88,12 @@ async function run() {
   })
 
   // get data by email
-  app.get('/volunteer/:email', async (req,res) => {
+  app.get('/volunteer/:email', verifyToken, async (req,res) => {
+    const tokenEmail = req.user.email 
     const email = req.params.email
+    if(tokenEmail !== email) {
+      return res.status(403).send({message:'forbidden access'})
+    }
     const query = { email : email}
     const result = await volunteerCollection.find(query).toArray()
     res.send(result) 
@@ -80,8 +112,12 @@ async function run() {
   })
  
  
-  app.get('/beAVolunteermail/:email', async (req,res) => {
+  app.get('/beAVolunteermail/:email', verifyToken, async (req,res) => {
+    const tokenEmail = req.user.email 
     const email = req.params.email
+    if(tokenEmail !== email) {
+      return res.status(403).send({message:'forbidden access'})
+    }
     const query = { email }
     const result = await beVolunteerCollection.find(query).toArray()
     res.send(result) 
