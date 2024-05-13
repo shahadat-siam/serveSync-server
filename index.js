@@ -9,7 +9,10 @@ const port = process.env.PORT || 5000
 
 //------ middlewere ----
 const corsOptions = {
-    origin:['http://localhost:5173','http://localhost:5174'],
+    origin:[
+      'http://localhost:5173','http://localhost:5174',
+      'https://servesync-bbc40.web.app','https://servesync-bbc40.firebaseapp.com'
+    ],
     credentials: true,
     optionSuccessStatus:200, 
 }
@@ -27,7 +30,7 @@ app.use(cookieParser())
                 if(err){
                    return  res.status(401).send({message:'unauthorized access'})
                 }
-                console.log(decoded)
+                // console.log(decoded)
                 req.user = decoded 
                 next()
             })
@@ -44,7 +47,7 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   }
-});
+}); 
 
 async function run() {
   try {
@@ -57,10 +60,10 @@ async function run() {
         const user = req.body
         const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'365d'})
         res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
-        }).send({success: true})
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production' ,
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
+        } ).send({success: true})
      })
 
       // clear token on logout
