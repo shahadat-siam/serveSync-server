@@ -39,6 +39,7 @@ async function run() {
         res.send(result)
     })
 
+
     // save add volunteer post data
     app.post('/volunteer', async(req,res) => {
       const volunteerData = req.body
@@ -61,9 +62,16 @@ async function run() {
     res.send(result)
   })
 
-  // get specific data from database 
-  app.get('/volunteer/:id', async (req,res) => {
-    const id = req.params.id
+  app.get('/beAVolunteer', async (req,res) => {
+    const result = await beVolunteerCollection.find().toArray()
+    res.send(result)
+  })
+ 
+ 
+
+   // get specific data from database 
+   app.get('/volunteersingle/:id', async (req,res) => {
+    const id = req.params.id 
     const query = {_id: new ObjectId(id)}
     const result = await volunteerCollection.findOne(query)
     res.send(result)
