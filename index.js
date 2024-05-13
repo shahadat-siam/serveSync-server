@@ -68,6 +68,12 @@ async function run() {
   })
  
  
+  app.get('/beAVolunteermail/:email', async (req,res) => {
+    const email = req.params.email
+    const query = { email }
+    const result = await beVolunteerCollection.find(query).toArray()
+    res.send(result) 
+  })
 
    // get specific data from database 
    app.get('/volunteersingle/:id', async (req,res) => {
