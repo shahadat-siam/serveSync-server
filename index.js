@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken')
+const cookieParser =  require('cookie-parser')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express()
@@ -32,6 +34,16 @@ async function run() {
     const volunteerCollection = client.db('ServeSync').collection('volunteerNeed')
     const beVolunteerCollection = client.db('ServeSync').collection('beVolunteer')
     
+      // jwt token genarate
+      app.post('/jwt', async (req, res) => {
+        const user = req.body
+        const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'365d'})
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
+        }).send({success: true})
+     })
     
     // get all data from db
     app.get('/volunteer', async (req,res) => {
@@ -82,6 +94,22 @@ async function run() {
     const result = await volunteerCollection.findOne(query)
     res.send(result)
   }) 
+
+  //  app.get('/beAVolunteer/:id', async (req,res) => {
+  //   const id = req.params.id 
+  //   const query = {_id: new ObjectId(id)}
+  //   const result = await beVolunteerCollection.findOne(query)
+  //   res.send(result)
+  // }) 
+
+  app.delete('/beAVolunteer/:id', async (req,res) => {
+    const id = req.params.id
+    const query = {_id : new ObjectId(id)}
+    const result = await beVolunteerCollection.deleteOne(query)
+    res.send(result)
+  })
+
+  
 
   // delete data from databage
   app.delete('/volunteer/:id', async (req,res) => {
