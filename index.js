@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000
 //------ middlewere ----
 const corsOptions = {
     origin:[
-      'http://localhost:5173','http://localhost:5174',
+      'http://localhost:5173',
       'https://servesync-bbc40.web.app','https://servesync-bbc40.firebaseapp.com'
     ],
     credentials: true,
